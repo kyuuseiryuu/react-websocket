@@ -1,7 +1,7 @@
 {
-  "name": "react-websocket",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@kyuuseiryuu/react-websocket",
+  "version": "0.0.1",
+  "description": "Easy to create websocket and handle it.",
   "main": "index.js",
   "scripts": {
     "build": "rimraf bin && babel src --out-dir bin --source-maps --extensions .js --copy-files",
@@ -22,5 +22,20 @@
   },
   "dependencies": {
     "prop-types": "^15.5.10"
-  }
+  },
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HeyChioy/react-websocket.git"
+  },
+  "keywords": [
+    "react",
+    "websocket"
+  ],
+  "bugs": {
+    "url": "https://github.com/HeyChioy/react-websocket/issues"
+  },
+  "homepage": "https://github.com/HeyChioy/react-websocket#readme"
 }
