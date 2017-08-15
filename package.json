@@ -1,10 +1,10 @@
 {
   "name": "@kyuuseiryuu/react-websocket",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easy to create websocket and handle it.",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf bin && babel src --out-dir bin --source-maps --extensions .js --copy-files",
+    "build": "rimraf lib && babel src --out-dir lib --source-maps --extensions .js --copy-files",
     "start": "webpack-dev-server --progress --color",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,7 +24,8 @@
     "prop-types": "^15.5.10"
   },
   "directories": {
-    "example": "example"
+    "example": "example",
+    "lib": "lib"
   },
   "repository": {
     "type": "git",

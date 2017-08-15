@@ -1,3 +1,3 @@
-const WebSocketRC = require('./bin/WebSocketRC');
+const WebSocketRC = require('./lib/WebSocketRC');
 
 module.exports = WebSocketRC;
