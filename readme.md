@@ -16,7 +16,6 @@ then you can see the demo
 - `npm install @kyuuseiryuuu/react-websocket`
 
 
-
 ## update log
 
 - v0.0.3 action map support, proxy send method.
