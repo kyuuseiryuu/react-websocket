@@ -6,6 +6,7 @@ class WebSocketRC extends React.Component {
     super(props);
     const { url, protocol } = props; // Config
     const { onCreate, onMessage, onClose, onError } = props;// Event
+    const { actionKey = 'SYS_ACTION', actionMap = {} } = props;
     this.state = {
       ws: new WebSocket(url, protocol),
       // Event
@@ -16,22 +17,46 @@ class WebSocketRC extends React.Component {
       // Config
       url,
       protocol,
+      actionKey,
+      actionMap,
     };
   }
   componentWillMount() {
     this.setWebSocket();
   }
+  handleMessage = ({ data }) => {
+    try {
+      const json = JSON.parse(data);
+      const action = json[this.state.actionKey];
+      const handler = this.state.actionMap[action];
+      if (action && handler) {
+          handler(json);
+      } else {
+        this.state.onMessage(json);
+      }
+    } catch (e) {
+      const result = {
+         rawText: data,
+      };
+      this.state.onMessage(result);
+    }
+  };
   componentWillUnmount() {
     this.state.ws.close();
   }
   setWebSocket() {
     const ws = this.state.ws;
-    ws.onopen = () => {
-      if (this.state.onCreate && ws.readyState === 1) {
-        this.state.onCreate(ws);
+    const proxy = {
+      send(data) {
+        ws.send(typeof data === 'string' ? data : JSON.stringify(data));
       }
     };
-    ws.onmessage = this.state.onMessage;
+    ws.onopen = () => {
+      if (this.state.onCreate && ws.readyState === 1) {
+        this.state.onCreate(proxy, ws);
+      }
+    };
+    ws.onmessage = this.handleMessage;
     ws.onerror = this.state.onError;
     ws.onclose = this.state.onClose;
   }
@@ -55,6 +80,8 @@ WebSocketRC.propTypes = {
     onCreate: PropTypes.func,
     onClose: PropTypes.func,
     onError: PropTypes.func,
+    actionMap: PropTypes.object,
+    actionKey: PropTypes.string,
 };
 
 export default WebSocketRC;

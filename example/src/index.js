@@ -12,15 +12,14 @@ class App extends React.Component {
     }
 
     saveSocket(ws) {
+        console.log(ws);
         this.setState({
             ws
         });
         console.log('WebSocket created!');
     }
-    handleMsg({ data }) {
-        this.setState({
-            msg: data,
-        })
+    handleMsg(data) {
+        console.log('handleMessage', data);
     }
     sendMessage() {
         const ws = this.state.ws;
@@ -28,10 +27,10 @@ class App extends React.Component {
             alert('网络异常');
             return;
         }
-        const data = JSON.stringify({
-          name: 'KyuuSeiryuu',
-          now: Date.now(),
-        });
+        const data = {
+          data: [1,2],
+          SYS_ACTION: 'alert',
+        };
         ws.send(data);
     }
     render() {
@@ -43,6 +42,14 @@ class App extends React.Component {
                     onMessage={this.handleMsg.bind(this)}
                     onClose={() => alert('连接已关闭！')}
                     onError={() => alert('服务器异常！')}
+                    actionMap={{
+                        help(data) {
+                            console.log('help who?');
+                        },
+                        alert(data) {
+                            alert(JSON.stringify(data));
+                        }
+                    }}
                 />
                 <button
                     onClick={this.sendMessage.bind(this)}

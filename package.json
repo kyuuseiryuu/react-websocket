@@ -1,11 +1,12 @@
 {
   "name": "@kyuuseiryuu/react-websocket",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easy to create websocket and handle it.",
   "main": "index.js",
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --source-maps --extensions .js --copy-files",
     "start": "webpack-dev-server --progress --color",
+    "tstart": "npm run build && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "KyuuSeiryuu",
