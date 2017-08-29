@@ -21,7 +21,7 @@ then you can see the demo
 - v0.0.3 action map support, proxy send method.
    > - You can use actionMap attribute to handle default action key 'SYS_ACTION' or custom actionKey attribute
    > - Proxy object can send JSON data or string.
-
+- v0.0.4 auto reconnect support.
 
 ## props
 
