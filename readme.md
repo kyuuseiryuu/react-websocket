@@ -22,3 +22,22 @@ then you can see the demo
    > - You can use actionMap attribute to handle default action key 'SYS_ACTION' or custom actionKey attribute
    > - Proxy object can send JSON data or string.
 
+
+## props
+
+```js
+WebSocketRC.propTypes = {
+    url: PropTypes.string.isRequired,
+    protocol: PropTypes.string,
+    onMessage: PropTypes.func.isRequired,
+    onCreate: PropTypes.func,
+    onClose: PropTypes.func,
+    onError: PropTypes.func,
+    onRetry: PropTypes.func,
+    actionMap: PropTypes.object,
+    actionKey: PropTypes.string, // will find this key in received data and try to map action.
+    autoReconnect: PropTypes.bool, // default false.
+    maxRetryTimes: PropTypes.number, // default 3
+    retryDelay: PropTypes.number, // default 3000 (ms)
+};
+```
