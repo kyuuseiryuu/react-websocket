@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --source-maps --extensions .js --copy-files",
-    "start": "webpack-dev-server --progress --color",
+    "start": "webpack-dev-server --color",
     "tstart": "npm run build && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

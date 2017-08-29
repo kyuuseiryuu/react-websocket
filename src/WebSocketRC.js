@@ -2,75 +2,85 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class WebSocketRC extends React.Component {
-  constructor(props) {
-    super(props);
-    const { url, protocol } = props; // Config
-    const { onCreate, onMessage, onClose, onError } = props;// Event
-    const { actionKey = 'SYS_ACTION', actionMap = {} } = props;
-    this.state = {
-      ws: new WebSocket(url, protocol),
-      // Event
-      onCreate,
-      onMessage,
-      onClose,
-      onError,
-      // Config
-      url,
-      protocol,
-      actionKey,
-      actionMap,
-    };
-  }
-  componentWillMount() {
-    this.setWebSocket();
-  }
-  handleMessage = ({ data }) => {
-    try {
-      const json = JSON.parse(data);
-      const action = json[this.state.actionKey];
-      const handler = this.state.actionMap[action];
-      if (action && handler) {
-          handler(json);
-      } else {
-        this.state.onMessage(json);
-      }
-    } catch (e) {
-      const result = {
-         rawText: data,
-      };
-      this.state.onMessage(result);
+    constructor(props) {
+        super(props);
+        const { url, protocol } = props; // Config
+        const { actionKey = 'SYS_ACTION', actionMap = {} } = props;
+        this.shouldClose = false;
+        this.retryTimes = 1;
+        this.state = {
+            // Config
+            url,
+            protocol,
+            actionKey,
+            actionMap,
+        };
     }
-  };
-  componentWillUnmount() {
-    this.state.ws.close();
-  }
-  setWebSocket() {
-    const ws = this.state.ws;
-    const proxy = {
-      send(data) {
-        ws.send(typeof data === 'string' ? data : JSON.stringify(data));
+    handleMessage = ({ data }) => {
+        try {
+            const json = JSON.parse(data);
+            const action = json[this.props.actionKey];
+            const handler = this.props.actionMap[action];
+            if (action && handler) {
+                handler(json);
+            } else {
+                this.props.onMessage(json);
+            }
+        } catch (e) {
+            const result = { rawText: data};
+            this.props.onMessage(result);
+        }
+    };
+    componentWillMount() {
+        this.initWebSocket();
+    }
+    componentWillUnmount() {
+        this.shouldClose = true;
+        this.ws.close();
+    }
+    closeOldSocket = () => {
+      if (this.ws && this.ws.readyState === ws.CONNECTING) {
+          this.shouldClose = true;
+          this.ws.close();
       }
     };
-    ws.onopen = () => {
-      if (this.state.onCreate && ws.readyState === 1) {
-        this.state.onCreate(proxy, ws);
-      }
-    };
-    ws.onmessage = this.handleMessage;
-    ws.onerror = this.state.onError;
-    ws.onclose = this.state.onClose;
-  }
-  render() {
-    return (
-      <div
-        style={{
-          display: 'none',
-        }}
-      >
-        WebSocket React Component by KyuuSeiryuu.
-      </div>
-    );
-  }
+    initWebSocket() {
+        this.closeOldSocket();
+        const ws = new WebSocket(this.props.url, this.props.protocol);
+        ws.onclose = () => {
+            console.log(this.retryTimes);
+            if (this.shouldClose || this.retryTimes++ > ( this.props.maxRetryTimes || 3)) {
+                this.props.onClose();
+                return;
+            }
+            this.props.onRetry && this.props.onRetry();
+            setTimeout(() => {
+                this.initWebSocket();
+            }, this.props.retryDelay || 3000);
+        };
+        ws.onerror = (e) => {
+            this.props.onError(e);
+            ws.close();
+        };
+        ws.onmessage = this.handleMessage;
+        const decorator = {
+            send(data) {
+                const sendData = data.constructor === String ?
+                    data: JSON.stringify(data);
+                ws.send(sendData);
+            }
+        };
+        ws.onopen = () => {
+            this.retryTimes = 1;
+            this.ws = ws;
+            this.props.onCreate(decorator, ws);
+        }
+    }
+    render() {
+        return (
+            <span style={{ display: 'none' }}>WebSocket React Component by KyuuSeiryuu.</span>
+        );
+    }
 }
 
 WebSocketRC.propTypes = {
@@ -80,8 +90,12 @@ WebSocketRC.propTypes = {
     onCreate: PropTypes.func,
     onClose: PropTypes.func,
     onError: PropTypes.func,
+    onRetry: PropTypes.func,
     actionMap: PropTypes.object,
     actionKey: PropTypes.string,
+    autoReconnect: PropTypes.bool,
+    maxRetryTimes: PropTypes.number,
+    retryDelay: PropTypes.number,
 };
 
 export default WebSocketRC;

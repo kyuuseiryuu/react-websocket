@@ -11,8 +11,9 @@ class App extends React.Component {
         }
     }
 
-    saveSocket(ws) {
+    saveSocket(ws, b) {
         console.log(ws);
+        window.ws = b;
         this.setState({
             ws
         });
@@ -42,8 +43,12 @@ class App extends React.Component {
                     onMessage={this.handleMsg.bind(this)}
                     onClose={() => alert('连接已关闭！')}
                     onError={() => alert('服务器异常！')}
+                    onRetry={() => console.log('on Retry')}
+                    autoReconnect
+                    maxRetryTimes={2}
+                    actionKey="action"
                     actionMap={{
-                        help(data) {
+                        help() {
                             console.log('help who?');
                         },
                         alert(data) {
