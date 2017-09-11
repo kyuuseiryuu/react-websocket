@@ -13,7 +13,7 @@ then you can see the demo
 
 ### npm 
 
-- `npm install @kyuuseiryuuu/react-websocket`
+<del>- `npm install @kyuuseiryuuu/react-websocket`</del>
 
 
 ## update log
