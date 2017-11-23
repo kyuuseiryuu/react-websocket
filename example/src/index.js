@@ -8,6 +8,7 @@ class App extends React.Component {
         this.state = {
             ws: null,
             msg: '',
+            data: ''
         }
     }
 
@@ -21,6 +22,7 @@ class App extends React.Component {
     }
     handleMsg(data) {
         console.log('handleMessage', data);
+        this.setState({ msg: JSON.stringify(data) })
     }
     sendMessage() {
         const ws = this.state.ws;
@@ -28,9 +30,10 @@ class App extends React.Component {
             alert('网络异常');
             return;
         }
+
         const data = {
-          data: [1,2],
-          SYS_ACTION: 'alert',
+          data: this.ta.value,
+          action: this.action.value
         };
         ws.send(data);
     }
@@ -56,6 +59,11 @@ class App extends React.Component {
                         }
                     }}
                 />
+                <textarea rows={3} ref={r => (this.ta = r)} style={{ width: '100%' }}>
+                  { this.state.data }
+                </textarea>
+                Action: <input ref={r => (this.action = r)} />
+                <br />
                 <button
                     onClick={this.sendMessage.bind(this)}
                 >send message</button>
