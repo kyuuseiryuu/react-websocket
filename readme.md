@@ -12,8 +12,8 @@ Easy to create websocket and handle it.
 then you can see the demo
 
 ### npm 
-
-<del>- `npm install @kyuuseiryuuu/react-websocket`</del>
+1. `npm config set scope @kyuuseiryuu:registry=https://registry.npmjs.org/`
+2. `npm install @kyuuseiryuuu/react-websocket`
 
 
 ## update log
