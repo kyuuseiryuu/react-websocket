@@ -40,7 +40,7 @@ class WebSocketRC extends React.Component {
     this.ws.close();
   }
   closeOldSocket = () => {
-    if (this.ws && this.ws.readyState === ws.CONNECTING) {
+    if (this.ws && (this.ws.readyState === WebSocket.CONNECTING)) {
       this.shouldClose = true;
       this.ws.close();
     }
