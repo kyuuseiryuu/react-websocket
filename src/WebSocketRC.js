@@ -2,6 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
+const tryToParseJson = (str) => {
+  try {
+    return JSON.parse(str)
+  } catch (e) {}
+}
+
 class WebSocketRC extends React.Component {
   constructor(props) {
     super(props);
@@ -18,18 +24,17 @@ class WebSocketRC extends React.Component {
     };
   }
   handleMessage = ({ data }) => {
-    try {
-      const json = JSON.parse(data);
+    const json = tryToParseJson(data)
+    if (json) {
       const action = json[this.props.actionKey];
       const handler = this.props.actionMap[action];
       if (action && handler) {
         handler(json);
       } else {
-        this.props.onMessage(json);
+        this.props.onJson(json);
       }
-    } catch (e) {
-      const result = { rawText: data};
-      this.props.onMessage(result);
+    } else {
+      this.props.onMessage(data);
     }
   };
   componentWillMount() {
@@ -89,6 +94,7 @@ WebSocketRC.propTypes = {
   url: PropTypes.string.isRequired,
   protocol: PropTypes.string,
   onMessage: PropTypes.func.isRequired,
+  onJson: PropTypes.func,
   onCreate: PropTypes.func,
   onClose: PropTypes.func,
   onError: PropTypes.func,
@@ -107,7 +113,9 @@ WebSocketRC.defaultProps = {
   onError: () => {},
   autoReconnect: false,
   maxRetryTimes: 3,
-  retryDelay: 3000
+  retryDelay: 3000,
+  actionMap: {},
+  onJson: () => {}
 }
 
 export default WebSocketRC;

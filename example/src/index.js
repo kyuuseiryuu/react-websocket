@@ -33,9 +33,18 @@ class App extends React.Component {
 
         const data = {
           data: this.ta.value,
-          action: this.action.value
         };
+        data[this.actionName.value] = this.action.value
         ws.send(data);
+    }
+    sendStr() {
+      const ws = this.state.ws;
+      if (!ws) {
+        alert('网络异常');
+        return;
+      }
+
+      ws.send(this.ta.value);
     }
     render() {
         return(
@@ -44,6 +53,7 @@ class App extends React.Component {
                     url="ws://localhost:8001"
                     onCreate={this.saveSocket.bind(this)}
                     onMessage={this.handleMsg.bind(this)}
+                    onJson={this.handleMsg.bind(this)}
                     onClose={() => alert('连接已关闭！')}
                     onError={() => alert('服务器异常！')}
                     onRetry={() => console.log('on Retry')}
@@ -62,11 +72,15 @@ class App extends React.Component {
                 <textarea rows={3} ref={r => (this.ta = r)} style={{ width: '100%' }}>
                   { this.state.data }
                 </textarea>
+                ActionName: <input ref={r => (this.actionName = r)} />
                 Action: <input ref={r => (this.action = r)} />
                 <br />
                 <button
                     onClick={this.sendMessage.bind(this)}
-                >send message</button>
+                >send json</button>
+              <button
+                onClick={this.sendStr.bind(this)}
+              >send message</button>
                 <div>
                     <h2>收到的消息</h2>
                     <div>
