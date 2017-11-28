@@ -1,6 +1,6 @@
 {
   "name": "@kyuuseiryuu/react-websocket",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Easy to create websocket and handle it.",
   "main": "index.js",
   "scripts": {
