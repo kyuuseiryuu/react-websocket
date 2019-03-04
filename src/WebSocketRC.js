@@ -1,22 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 
 const tryToParseJson = (str) => {
   try {
     return JSON.parse(str)
   } catch (e) {}
-}
+};
 
 class WebSocketRC extends React.Component {
   constructor(props) {
     super(props);
-    const { url, protocol } = props; // Config
+    const { url, protocol } = props;
     const { actionKey = 'SYS_ACTION', actionMap = {} } = props;
     this.shouldClose = false;
     this.retryTimes = 1;
     this.state = {
-      // Config
       url,
       protocol,
       actionKey,
@@ -24,7 +22,7 @@ class WebSocketRC extends React.Component {
     };
   }
   handleMessage = ({ data }) => {
-    const json = tryToParseJson(data)
+    const json = tryToParseJson(data);
     if (json) {
       const action = json[this.props.actionKey];
       const handler = this.props.actionMap[action];
@@ -42,12 +40,12 @@ class WebSocketRC extends React.Component {
   }
   componentWillUnmount() {
     this.shouldClose = true;
-    this.ws.close();
+    this.ws && this.ws.close();
   }
   closeOldSocket = () => {
     if (this.ws && (this.ws.readyState === WebSocket.CONNECTING)) {
       this.shouldClose = true;
-      this.ws.close();
+      this.ws && this.ws.close();
     }
   };
   initWebSocket() {
@@ -56,18 +54,20 @@ class WebSocketRC extends React.Component {
     ws.onclose = () => {
       if (!this.props.autoReconnect || // needn't reconnect
         this.shouldClose || // really want to close
-        this.retryTimes++ > ( this.props.maxRetryTimes)) {
+        (this.props.maxRetryTimes && this.retryTimes + 1 > this.props.maxRetryTimes)
+      ) {
         this.props.onClose();
         return;
       }
-      this.props.onRetry();
+      this.props.onRetry(this.retryTimes);
+      this.retryTimes += 1;
       setTimeout(() => {
         this.initWebSocket();
       }, this.props.retryDelay);
     };
     ws.onerror = (e) => {
       this.props.onError(e);
-      ws.close();
+      (ws && ws.close());
     };
     ws.onmessage = this.handleMessage;
     const decorator = {
@@ -90,32 +90,17 @@ class WebSocketRC extends React.Component {
   }
 }
 
-WebSocketRC.propTypes = {
-  url: PropTypes.string.isRequired,
-  protocol: PropTypes.string,
-  onMessage: PropTypes.func.isRequired,
-  onJson: PropTypes.func,
-  onCreate: PropTypes.func,
-  onClose: PropTypes.func,
-  onError: PropTypes.func,
-  onRetry: PropTypes.func,
-  actionMap: PropTypes.object,
-  actionKey: PropTypes.string,
-  autoReconnect: PropTypes.bool,
-  maxRetryTimes: PropTypes.number,
-  retryDelay: PropTypes.number,
-};
-
 WebSocketRC.defaultProps = {
+  onMessage: () => {},
   onCreate: () => {},
   onClose: () => {},
   onRetry: () => {},
   onError: () => {},
+  onJson: () => {},
   autoReconnect: false,
   maxRetryTimes: 3,
   retryDelay: 3000,
   actionMap: {},
-  onJson: () => {}
-}
+};
 
 export default WebSocketRC;
